@@ -1,1 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirection - Keys & Click</title>
+    <meta http-equiv="refresh" content="0; url=/">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        p {
+            opacity: 0.8;
+            margin: 0;
+        }
+        
+        .progress-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin: 1.5rem auto 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            width: 100%;
+            height: 100%;
+            background: white;
+            animation: progress 1s ease-in-out;
+            transform-origin: left;
+        }
+        
+        @keyframes progress {
+            0% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <h1>Keys & Click</h1>
+        <p>Chargement de l'application...</p>
+        <p>Redirection en cours</p>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+    </div>
 
+    <script>
+        // Redirection immédiate avec fallback
+        setTimeout(function() {
+            window.location.href = "";
+        }, 100);
+        
+        // Message de console pour le débogage
+        console.log('🚀 Redirection vers Keys & Click...');
+        console.log('🎯 Application de test de performance');
+        console.log('⌨️ Test de frappe | 🖱️ Précision souris | ⚡ Test CPS');
+    </script>
+</body>
+</html>
