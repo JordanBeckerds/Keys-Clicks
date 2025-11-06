@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keys & Click - Test de Frappe et Souris</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="shortcut icon" href="assets/Keys&Clicks(favicon).png" type="image/x-icon">
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+      <!-- Header -->
+      <header class="text-center mb-6 sm:mb-12">
+        <div class="flex items-center justify-center gap-[2.5vh] mb-[2vh]">
+            <img src="assets/Keys&Clicks(favicon).png" alt="Logo" class="max-h-[10vh]">
+            <h1 class="text-2xl sm:text-4xl font-bold text-blue-400 mb-2">
+                Keys & Click
+            </h1>
+        </div>
+        <p class="text-xs sm:text-base text-gray-400">
+          Testez votre vitesse de frappe, votre précision au clavier et avec la
+          souris
+        </p>
+      </header>
+
+      <!-- Language Selector -->
+      <div class="flex justify-end mb-3 sm:mb-4">
+        <select
+          id="language-select"
+          class="bg-gray-800 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-sm"
+        >
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex justify-center mb-4 sm:mb-8">
+        <div
+          class="bg-gray-800 rounded-lg p-1 flex space-x-1 overflow-x-auto max-w-full"
+        >
+          <button
+            id="typing-tab"
+            class="tab-btn active px-3 sm:px-6 py-1 sm:py-2 rounded-md transition-colors whitespace-nowrap text-xs sm:text-base"
+            data-key="typingTest"
+          >
+            Test de Frappe
+          </button>
+          <button
+            id="cps-tab"
+            class="tab-btn px-3 sm:px-6 py-1 sm:py-2 rounded-md transition-colors whitespace-nowrap text-xs sm:text-base"
+            data-key="cpsTest"
+          >
+            Test CPS
+          </button>
+          <button
+            id="keypress-tab"
+            class="tab-btn px-3 sm:px-6 py-1 sm:py-2 rounded-md transition-colors whitespace-nowrap text-xs sm:text-base"
+            data-key="keyPressTest"
+          >
+            Test Clavier
+          </button>
+          <button
+            id="mouse-tab"
+            class="tab-btn px-3 sm:px-6 py-1 sm:py-2 rounded-md transition-colors whitespace-nowrap text-xs sm:text-base"
+            data-key="mouseTest"
+          >
+            Précision Souris
+          </button>
+        </div>
+      </nav>
+
+      <!-- Test Sections -->
+      <main>
+        <!-- Typing Test Section -->
+        <section id="typing-section" class="test-section active">
+          <div class="bg-gray-800 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 space-y-2 sm:space-y-0"
+            >
+              <h2
+                class="text-xl sm:text-2xl font-semibold"
+                data-key="typingTitle"
+              >
+                Test de Vitesse de Frappe
+              </h2>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                  <span class="text-xs sm:text-sm text-gray-400" data-key="time"
+                    >Durée:</span
+                  >
+                  <select
+                    id="typing-duration"
+                    class="bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm"
+                  >
+                    <option value="30">30s</option>
+                    <option value="60" selected>60s</option>
+                    <option value="120">120s</option>
+                    <option value="300">300s</option>
+                  </select>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                  <span
+                    class="text-xs sm:text-sm text-gray-400"
+                    data-key="fontSize"
+                    >Taille:</span
+                  >
+                  <select
+                    id="typing-font-size"
+                    class="bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm"
+                  >
+                    <option value="small">Petite</option>
+                    <option value="medium" selected>Moyenne</option>
+                    <option value="large">Grande</option>
+                    <option value="xlarge">Très grande</option>
+                  </select>
+                </div>
+                <div class="flex space-x-3 sm:space-x-4 text-xs sm:text-sm">
+                  <div data-key="time">Temps: <span id="timer">60s</span></div>
+                  <div data-key="wpm">Mots/min: <span id="wpm">0</span></div>
+                  <div data-key="accuracy">
+                    Précision: <span id="accuracy">100%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3 sm:mb-4">
+              <div
+                id="text-container"
+                class="relative bg-gray-700 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 h-32 sm:h-48 overflow-hidden"
+              >
+                <div
+                  id="sample-text"
+                  class="text-gray-300 leading-relaxed transition-all duration-300"
+                >
+                  Chargement du texte...
+                </div>
+                <div
+                  id="typing-cursor"
+                  class="absolute top-3 sm:top-4 left-3 sm:left-4 w-1 sm:w-2 h-4 sm:h-6 bg-blue-500 opacity-0 transition-all duration-200"
+                ></div>
+              </div>
+              <textarea
+                id="typing-input"
+                class="w-full h-24 sm:h-32 p-3 sm:p-4 bg-gray-700 border border-gray-600 rounded-lg resize-none focus:border-blue-500 focus:outline-none text-sm sm:text-base"
+                placeholder="Commencez à taper ici..."
+                disabled
+              ></textarea>
+            </div>
+
+            <div
+              class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3"
+            >
+              <button
+                id="start-typing"
+                class="bg-blue-600 hover:bg-blue-700 px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
+                data-key="startTest"
+              >
+                Démarrer le Test
+              </button>
+              <button
+                id="reset-typing"
+                class="bg-gray-600 hover:bg-gray-700 px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
+                data-key="reset"
+              >
+                Réinitialiser
+              </button>
+              <button
+                id="new-text"
+                class="bg-green-600 hover:bg-green-700 px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
+                data-key="newText"
+              >
+                Nouveau Texte
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- CPS Test Section -->
+        <section id="cps-section" class="test-section hidden">
+          <div class="bg-gray-800 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 space-y-2 sm:space-y-0"
+            >
+              <h2 class="text-xl sm:text-2xl font-semibold" data-key="cpsTitle">
+                Test CPS (Clicks Par Seconde)
+              </h2>
+              <div class="flex items-center space-x-2">
+                <span
+                  class="text-xs sm:text-sm text-gray-400"
+                  data-key="testDuration"
+                  >Durée:</span
+                >
+                <select
+                  id="cps-duration"
+                  class="bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm"
+                >
+                  <option value="5">5s</option>
+                  <option value="10" selected>10s</option>
+                  <option value="15">15s</option>
+                  <option value="30">30s</option>
+                  <option value="60">60s</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="text-center mb-4 sm:mb-6">
+              <div
+                class="text-sm sm:text-lg text-gray-400 mb-3 sm:mb-4"
+                data-key="cpsInstructions"
+              >
+                Cliquez le plus rapidement possible dans la zone ci-dessous
+              </div>
+              <div
+                id="cps-test-area"
+                class="w-full h-48 sm:h-64 bg-gray-700 rounded-lg cursor-pointer border-4 border-blue-500 flex items-center justify-center transition-all duration-200 hover:bg-gray-600 active:bg-gray-800 active:scale-95 touch-none"
+              >
+                <div class="text-center">
+                  <div
+                    class="text-2xl sm:text-4xl font-bold text-white mb-2"
+                    id="cps-display"
+                  >
+                    0.00
+                  </div>
+                  <div
+                    class="text-base sm:text-lg text-blue-300"
+                    data-key="cps"
+                  >
+                    CPS
+                  </div>
+                  <div
+                    class="text-xs sm:text-sm text-gray-300 mt-2"
+                    data-key="clickToStart"
+                  >
+                    Cliquez pour commencer
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6 text-center"
+            >
+              <div class="bg-gray-700 rounded-lg p-2 sm:p-4">
+                <div
+                  class="text-lg sm:text-2xl font-bold text-green-400"
+                  id="current-cps"
+                >
+                  0.00
+                </div>
+                <div
+                  class="text-xs sm:text-sm text-gray-400"
+                  data-key="currentCPS"
+                >
+                  CPS Actuel
+                </div>
+              </div>
+              <div class="bg-gray-700 rounded-lg p-2 sm:p-4">
+                <div
+                  class="text-lg sm:text-2xl font-bold text-blue-400"
+                  id="clicks-count"
+                >
+                  0
+                </div>
+                <div class="text-xs sm:text-sm text-gray-400" data-key="clicks">
+                  Clicks
+                </div>
+              </div>
+              <div class="bg-gray-700 rounded-lg p-2 sm:p-4">
+                <div
+                  class="text-lg sm:text-2xl font-bold text-yellow-400"
+                  id="time-left"
+                >
+                  10s
+                </div>
+                <div
+                  class="text-xs sm:text-sm text-gray-400"
+                  data-key="timeLeft"
+                >
+                  Temps Restant
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-center">
+              <button
+                id="reset-cps"
+                class="bg-gray-600 hover:bg-gray-700 px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
+                data-key="reset"
+              >
+                Réinitialiser
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Key Press Test Section -->
+        <section id="keypress-section" class="test-section hidden">
+          <div class="bg-gray-800 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 space-y-2 sm:space-y-0"
+            >
+              <h2
+                class="text-xl sm:text-2xl font-semibold"
+                data-key="keyPressTitle"
+              >
+                Test de Vitesse de Frappe
+              </h2>
+              <div class="flex items-center space-x-2">
+                <span
+                  class="text-xs sm:text-sm text-gray-400"
+                  data-key="testDuration"
+                  >Durée:</span
+                >
+                <select
+                  id="keypress-duration"
+                  class="bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm"
+                >
+                  <option value="30">30s</option>
+                  <option value="60" selected>60s</option>
+                  <option value="120">120s</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="text-center mb-4 sm:mb-6">
+              <div
+                class="text-sm sm:text-lg text-gray-400 mb-2"
+                data-key="keyPressInstructions"
+              >
+                Appuyez sur la touche affichée le plus rapidement possible
+              </div>
+              <div
+                class="text-4xl sm:text-6xl font-bold text-blue-400 mb-4 sm:mb-6 py-4 sm:py-8 bg-gray-700 rounded-lg"
+                id="target-key"
+              >
+                A
+              </div>
+              <div
+                class="text-lg sm:text-xl min-h-6 sm:min-h-8"
+                id="key-feedback"
+              ></div>
+            </div>
+
+            <!-- Historique des touches -->
+            <div class="mb-4 sm:mb-6">
+              <div
+                class="text-xs sm:text-sm text-gray-400 mb-2"
+                data-key="keyHistory"
+              >
+                Historique des touches:
+              </div>
+              <div
+                id="key-history"
+                class="flex flex-wrap gap-1 sm:gap-2 min-h-8 sm:min-h-12 p-2 bg-gray-700 rounded-lg"
+              >
+                <!-- Les touches pressées apparaîtront ici -->
+              </div>
+            </div>
+
+            <div
+              class="grid grid-cols-3 gap-2 sm:gap-4 text-center mb-4 sm:mb-6"
+            >
+              <div class="bg-gray-700 rounded-lg p-2 sm:p-4">
+                <div
+                  class="text-lg sm:text-2xl font-bold text-green-400"
+                  id="keys-pressed"
+                >
+                  0
+                </div>
+                <div
+                  class="text-xs sm:text-sm text-gray-400"
+                  data-key="keysPressed"
+                >
+                  Touches
+                </div>
+              </div>
+              <div class="bg-gray-700 rounded-lg p-2 sm:p-4">
+                <div
+                  class="text-lg sm:text-2xl font-bold text-blue-400"
+                  id="key-accuracy"
+                >
+                  0%
+                </div>
+                <div
+                  class="text-xs sm:text-sm text-gray-400"
+                  data-key="accuracy"
+                >
+                  Précision
+                </div>
+              </div>
+              <div class="bg-gray-700 rounded-lg p-2 sm:p-4">
+                <div
+                  class="text-lg sm:text-2xl font-bold text-yellow-400"
+                  id="key-timer"
+                >
+                  60s
+                </div>
+                <div
+                  class="text-xs sm:text-sm text-gray-400"
+                  data-key="timeLeft"
+                >
+                  Temps
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3"
+            >
+              <button
+                id="start-keypress"
+                class="bg-blue-600 hover:bg-blue-700 px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
+                data-key="startTest"
+              >
+                Démarrer le Test
+              </button>
+              <button
+                id="reset-keypress"
+                class="bg-gray-600 hover:bg-gray-700 px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
+                data-key="reset"
+              >
+                Réinitialiser
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Mouse Accuracy Test Section -->
+        <section id="mouse-section" class="test-section hidden">
+          <div class="bg-gray-800 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 space-y-2 sm:space-y-0"
+            >
+              <h2
+                class="text-xl sm:text-2xl font-semibold"
+                data-key="mouseTitle"
+              >
+                Test de Précision Souris
+              </h2>
+              <div class="flex flex-wrap gap-2 sm:gap-3">
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                  <span
+                    class="text-xs sm:text-sm text-gray-400"
+                    data-key="speed"
+                    >Vitesse:</span
+                  >
+                  <select
+                    id="mouse-speed"
+                    class="bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm"
+                  >
+                    <option value="slow">Lente</option>
+                    <option value="medium" selected>Moyenne</option>
+                    <option value="fast">Rapide</option>
+                    <option value="very-fast">Très rapide</option>
+                  </select>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                  <span
+                    class="text-xs sm:text-sm text-gray-400"
+                    data-key="targetSize"
+                    >Taille:</span
+                  >
+                  <select
+                    id="mouse-target-size"
+                    class="bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm"
+                  >
+                    <option value="small">Petite</option>
+                    <option value="medium" selected>Moyenne</option>
+                    <option value="large">Grande</option>
+                    <option value="very-large">Très grande</option>
+                  </select>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                  <span class="text-xs sm:text-sm text-gray-400" data-key="time"
+                    >Temps:</span
+                  >
+                  <select
+                    id="mouse-duration"
+                    class="bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm"
+                  >
+                    <option value="15">15s</option>
+                    <option value="30" selected>30s</option>
+                    <option value="45">45s</option>
+                    <option value="60">60s</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-3 sm:mb-4">
+              <div data-key="targetsHit">
+                Cibles touchées: <span id="targets-hit">0</span>
+              </div>
+              <div data-key="accuracy">
+                Précision: <span id="mouse-accuracy">0%</span>
+              </div>
+              <div data-key="time">
+                Temps: <span id="mouse-timer">30s</span>
+              </div>
+            </div>
+
+            <div
+              id="mouse-test-area"
+              class="w-full h-64 sm:h-[500px] bg-gray-700 rounded-lg relative overflow-hidden cursor-crosshair border-2 border-dashed border-gray-600 touch-none"
+            >
+              <div
+                id="mouse-start-screen"
+                class="absolute inset-0 flex items-center justify-center text-center p-4 sm:p-8 bg-gray-800 bg-opacity-90"
+              >
+                <div>
+                  <div
+                    class="text-lg sm:text-2xl text-blue-400 mb-3 sm:mb-4"
+                    data-key="clickToStart"
+                  >
+                    Cliquez pour commencer le test
+                  </div>
+                  <div
+                    class="text-xs sm:text-base text-gray-400"
+                    data-key="mouseInstructions"
+                  >
+                    Cliquez sur les cercles qui apparaîtront le plus rapidement
+                    possible
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-center mt-3 sm:mt-4">
+              <button
+                id="reset-mouse"
+                class="bg-gray-600 hover:bg-gray-700 px-4 sm:px-6 py-2 rounded-lg transition-colors text-sm sm:text-base"
+                data-key="reset"
+              >
+                Réinitialiser
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Results Modal -->
+      <div
+        id="results-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 px-3"
+      >
+        <div class="bg-gray-800 rounded-lg p-4 sm:p-6 max-w-md w-full mx-3">
+          <h3
+            class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center"
+            data-key="results"
+          >
+            Résultats du Test
+          </h3>
+          <div id="results-content" class="space-y-2 text-sm sm:text-base">
+            <!-- Results will be displayed here -->
+          </div>
+          <button
+            id="close-results"
+            class="w-full mt-4 sm:mt-6 bg-blue-600 hover:bg-blue-700 py-2 rounded-lg transition-colors text-sm sm:text-base"
+            data-key="close"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/language.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/typingTest.js"></script>
+    <script src="js/cpsTest.js"></script>
+    <script src="js/keyPressTest.js"></script>
+    <script src="js/mouseTest.js"></script>
+  </body>
+</html>

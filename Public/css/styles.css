@@ -1,0 +1,480 @@
+/* Custom styles */
+.test-section {
+    transition: opacity 0.3s ease;
+}
+
+.test-section.active {
+    display: block;
+}
+
+.test-section.hidden {
+    display: none;
+}
+
+.tab-btn.active {
+    background-color: #3b82f6;
+    color: white;
+}
+
+/* Animations pour les cibles souris */
+.target-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, #3b82f6, #1e40af);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+    cursor: crosshair;
+    transform-origin: center;
+}
+
+/* Animation d'apparition améliorée */
+@keyframes targetAppear {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1) rotate(0deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* Animation de pulsation */
+@keyframes targetPulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(59, 130, 246, 1);
+    }
+}
+
+.target-circle {
+    animation: 
+        targetAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        targetPulse 2s ease-in-out infinite;
+}
+
+/* Animation de succès */
+@keyframes targetSuccess {
+    0% {
+        transform: scale(1);
+        background: radial-gradient(circle, #3b82f6, #1e40af);
+    }
+    50% {
+        transform: scale(1.3);
+        background: radial-gradient(circle, #10b981, #059669);
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.target-success {
+    animation: targetSuccess 0.6s ease-out forwards;
+    pointer-events: none;
+}
+
+/* Animation de disparition */
+@keyframes targetDisappear {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.target-disappear {
+    animation: targetDisappear 0.3s ease-out forwards;
+}
+
+/* Animations pour le test de frappe */
+@keyframes smoothScroll {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(var(--scroll-distance));
+    }
+}
+
+.smooth-scroll {
+    animation: smoothScroll 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Curseur de frappe amélioré */
+@keyframes cursorBlink {
+    0%, 50% { 
+        opacity: 1;
+        transform: scaleY(1);
+    }
+    51%, 100% { 
+        opacity: 0.3;
+        transform: scaleY(0.7);
+    }
+}
+
+#typing-cursor {
+    animation: cursorBlink 1.2s ease-in-out infinite;
+    border-radius: 1px;
+}
+
+/* Animation d'erreur améliorée */
+@keyframes typingError {
+    0%, 100% { 
+        background-color: transparent;
+        transform: translateX(0);
+    }
+    25% { 
+        background-color: rgba(239, 68, 68, 0.3);
+        transform: translateX(-3px);
+    }
+    75% { 
+        background-color: rgba(239, 68, 68, 0.3);
+        transform: translateX(3px);
+    }
+}
+
+.typing-error {
+    animation: typingError 0.4s ease-in-out;
+}
+
+/* Highlight du caractère actuel */
+.current-char {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+    border-radius: 3px;
+    padding: 0 2px;
+    margin: 0 -2px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Styles responsifs */
+@media (max-width: 640px) {
+    .target-circle {
+        animation-duration: 0.3s, 1.5s;
+    }
+    
+    #typing-cursor {
+        animation-duration: 1s;
+    }
+    
+    .current-char {
+        padding: 0 1px;
+        margin: 0 -1px;
+    }
+}
+
+/* Empêcher le zoom sur mobile */
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Scrollbar personnalisée */
+#text-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#text-container::-webkit-scrollbar-track {
+    background: #374151;
+    border-radius: 3px;
+}
+
+#text-container::-webkit-scrollbar-thumb {
+    background: #6B7280;
+    border-radius: 3px;
+}
+
+#text-container::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+/* Effet de clic CPS amélioré */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.4);
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+        box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
+    }
+}
+
+.cps-click-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.8), transparent);
+    pointer-events: none;
+    animation: ripple 0.8s linear;
+}
+
+/* Animation pour les touches du clavier */
+@keyframes keyPress {
+    0% {
+        transform: scale(1);
+        background-color: #10b981;
+    }
+    50% {
+        transform: scale(1.1);
+        background-color: #059669;
+    }
+    100% {
+        transform: scale(1);
+        background-color: #10b981;
+    }
+}
+
+.key-press-animation {
+    animation: keyPress 0.3s ease-out;
+}
+
+/* Support tactile amélioré */
+@media (hover: none) and (pointer: coarse) {
+    .target-circle {
+        min-width: 50px;
+        min-height: 50px;
+    }
+    
+    #cps-test-area {
+        cursor: default;
+    }
+}
+
+/* Amélioration de la lisibilité sur mobile */
+@media (max-width: 640px) {
+    .char {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    #sample-text {
+        letter-spacing: 0.5px;
+    }
+}
+
+/* Dans Public/css/styles.css */
+@keyframes missEffect {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+        border: 2px solid #ef4444;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+        border: 2px solid #ef4444;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+        border: 2px solid #ef4444;
+    }
+}
+
+.target-miss-effect {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: missEffect 0.6s ease-out;
+}
+
+/* Correction du curseur et barre bleue */
+#text-container {
+    position: relative;
+    overflow-y: auto;
+}
+
+#typing-cursor {
+    position: absolute;
+    background-color: #3b82f6;
+    width: 2px;
+    border-radius: 1px;
+    pointer-events: none;
+    z-index: 10;
+    transition: all 0.1s ease;
+}
+
+/* Sur mobile, curseur plus fin */
+@media (max-width: 640px) {
+    #typing-cursor {
+        width: 1px;
+    }
+}
+
+/* Animation du curseur */
+@keyframes cursorBlink {
+    0%, 50% { 
+        opacity: 1;
+    }
+    51%, 100% { 
+        opacity: 0.3;
+    }
+}
+
+#typing-cursor {
+    animation: cursorBlink 1.2s ease-in-out infinite;
+}
+
+/* Highlight du caractère actuel - BARRE BLEUE CORRIGÉE */
+.current-char {
+    position: relative;
+    z-index: 5;
+}
+
+.current-char::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    width: calc(100% + 4px);
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    border-radius: 3px;
+    z-index: -1;
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        opacity: 0.7;
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    }
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+    }
+}
+
+/* Sur mobile, barre bleue plus discrète */
+@media (max-width: 640px) {
+    .current-char::after {
+        left: -1px;
+        width: calc(100% + 2px);
+        border-radius: 2px;
+    }
+}
+
+/* Caractères corrects */
+.correct-char {
+    color: #10b981;
+    position: relative;
+    z-index: 2;
+}
+
+/* Empêcher la sélection de texte */
+#sample-text {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Animation d'erreur */
+@keyframes typingError {
+    0%, 100% { 
+        background-color: transparent;
+    }
+    25%, 75% { 
+        background-color: rgba(239, 68, 68, 0.2);
+    }
+}
+
+.typing-error {
+    animation: typingError 0.4s ease-in-out;
+}
+
+/* Amélioration de la lisibilité */
+.char {
+    position: relative;
+    transition: color 0.2s ease;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Espacement des caractères pour meilleure lisibilité */
+#sample-text {
+    letter-spacing: 0.3px;
+    word-spacing: 1px;
+}
+
+@media (max-width: 640px) {
+    #sample-text {
+        letter-spacing: 0.2px;
+        word-spacing: 0.5px;
+    }
+}
+
+/* Styles pour les différentes tailles de police */
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+/* Adaptation mobile pour les grandes tailles */
+@media (max-width: 640px) {
+    .text-xl {
+        font-size: 1.125rem;
+        line-height: 1.625rem;
+    }
+    
+    .text-2xl {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+    }
+}
+
+/* Ajustement du curseur pour les différentes tailles */
+.text-sm ~ #typing-cursor {
+    height: 1rem;
+}
+
+.text-base ~ #typing-cursor {
+    height: 1.25rem;
+}
+
+.text-lg ~ #typing-cursor {
+    height: 1.5rem;
+}
+
+.text-xl ~ #typing-cursor {
+    height: 1.625rem;
+}
+
+.text-2xl ~ #typing-cursor {
+    height: 1.75rem;
+}
