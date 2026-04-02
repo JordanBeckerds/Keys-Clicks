@@ -226,7 +226,7 @@ h1, h2, h3 { font-family: var(--sans); line-height: 1.15; }
 
 .test-panel { display: none; }
 .test-panel.active { display: block; animation: fadeIn 200ms ease; 
-min-width: 960px;}
+min-width: 75vw;}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
