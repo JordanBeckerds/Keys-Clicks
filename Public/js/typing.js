@@ -77,7 +77,7 @@ const TypingTest = (() => {
   const $newBtn    = () => document.getElementById('typingNewText');
 
   // ── Helpers ─────────────────────────────────
-  function getLang() { return window.i18n ? i18n.getLang() : 'en'; }
+  function getLang() { return window.i18n ? i18n.getLang() : 'fr'; }
 
   function getWords() {
     const bank = wordBanks[getLang()] || wordBanks.en;
