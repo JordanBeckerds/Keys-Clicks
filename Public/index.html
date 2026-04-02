@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Keys & Click</title>
+  <meta name="description" content="Test your typing speed, mouse accuracy, reaction time, and click rate." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-bracket">[</span>
+        <span class="logo-text">KEYS<span class="logo-amp">&amp;</span>CLICK</span>
+        <span class="logo-bracket">]</span>
+      </div>
+      <button class="lang-btn" id="langToggle" aria-label="Toggle language">
+        <span id="langLabel">FR</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" aria-hidden="true">
+    <div class="hero-inner">
+      <p class="hero-tagline" data-i18n="heroTagline">measure. train. improve.</p>
+      <h1 class="hero-title" data-i18n="heroTitle">Your skills,<br/><em>benchmarked.</em></h1>
+    </div>
+    <div class="hero-grid"></div>
+  </section>
+
+  <!-- TAB NAV -->
+  <nav class="test-nav" role="tablist">
+    <button class="tab-btn active" data-tab="typing" role="tab" aria-selected="true" aria-controls="panel-typing">
+      <span class="tab-icon">⌨</span>
+      <span class="tab-label" data-i18n="tabTyping">Typing</span>
+    </button>
+    <button class="tab-btn" data-tab="cps" role="tab" aria-selected="false" aria-controls="panel-cps">
+      <span class="tab-icon">🖱</span>
+      <span class="tab-label" data-i18n="tabCPS">CPS</span>
+    </button>
+    <button class="tab-btn" data-tab="keypress" role="tab" aria-selected="false" aria-controls="panel-keypress">
+      <span class="tab-icon">⚡</span>
+      <span class="tab-label" data-i18n="tabKey">Keys</span>
+    </button>
+    <button class="tab-btn" data-tab="mouse" role="tab" aria-selected="false" aria-controls="panel-mouse">
+      <span class="tab-icon">🎯</span>
+      <span class="tab-label" data-i18n="tabMouse">Aim</span>
+    </button>
+  </nav>
+
+  <main class="test-container">
+
+    <!-- ===== TYPING TEST ===== -->
+    <section class="test-panel active" id="panel-typing" role="tabpanel">
+      <div class="panel-header">
+        <h2 data-i18n="typingTitle">Typing Speed</h2>
+        <div class="options-row">
+          <div class="option-group">
+            <span class="option-label" data-i18n="duration">Duration</span>
+            <div class="pill-group" id="typingDuration">
+              <button class="pill" data-value="15">15s</button>
+              <button class="pill active" data-value="30">30s</button>
+              <button class="pill" data-value="60">60s</button>
+              <button class="pill" data-value="120">120s</button>
+            </div>
+          </div>
+          <div class="option-group">
+            <span class="option-label" data-i18n="textSize">Words</span>
+            <div class="pill-group" id="typingWords">
+              <button class="pill active" data-value="20">20</button>
+              <button class="pill" data-value="40">40</button>
+              <button class="pill" data-value="80">80</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-chip"><span class="stat-val" id="typingWPM">0</span><span class="stat-lbl">WPM</span></div>
+        <div class="stat-chip"><span class="stat-val" id="typingAcc">100%</span><span class="stat-lbl" data-i18n="acc">ACC</span></div>
+        <div class="stat-chip"><span class="stat-val" id="typingTimer">30s</span><span class="stat-lbl" data-i18n="time">TIME</span></div>
+      </div>
+
+      <div class="typing-display" id="typingDisplay" aria-live="polite">
+        <span class="placeholder-text" data-i18n="typingPlaceholder">Press Start to begin…</span>
+      </div>
+
+      <input class="typing-input" id="typingInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Type here" disabled />
+
+      <div class="action-row">
+        <button class="btn-primary" id="typingStart" data-i18n="start">Start</button>
+        <button class="btn-ghost" id="typingReset" data-i18n="reset">Reset</button>
+        <button class="btn-ghost" id="typingNewText" data-i18n="newText">New Text</button>
+      </div>
+    </section>
+
+    <!-- ===== CPS TEST ===== -->
+    <section class="test-panel" id="panel-cps" role="tabpanel">
+      <div class="panel-header">
+        <h2 data-i18n="cpsTitle">Click Speed</h2>
+        <div class="options-row">
+          <div class="option-group">
+            <span class="option-label" data-i18n="duration">Duration</span>
+            <div class="pill-group" id="cpsDuration">
+              <button class="pill" data-value="5">5s</button>
+              <button class="pill active" data-value="10">10s</button>
+              <button class="pill" data-value="15">15s</button>
+              <button class="pill" data-value="30">30s</button>
+              <button class="pill" data-value="60">60s</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-chip"><span class="stat-val" id="cpsCurrent">0.00</span><span class="stat-lbl">CPS</span></div>
+        <div class="stat-chip"><span class="stat-val" id="cpsClicks">0</span><span class="stat-lbl" data-i18n="clicks">CLICKS</span></div>
+        <div class="stat-chip"><span class="stat-val" id="cpsTimer">10s</span><span class="stat-lbl" data-i18n="time">TIME</span></div>
+      </div>
+
+      <button class="cps-zone" id="cpsZone" aria-label="Click zone">
+        <div class="cps-inner">
+          <span class="cps-big-num" id="cpsBigNum">0.00</span>
+          <span class="cps-unit">CPS</span>
+          <span class="cps-hint" id="cpsHint" data-i18n="clickToStart">Tap to start</span>
+        </div>
+        <div class="cps-ripples" id="cpsRipples" aria-hidden="true"></div>
+      </button>
+
+      <div class="action-row">
+        <button class="btn-ghost" id="cpsReset" data-i18n="reset">Reset</button>
+      </div>
+    </section>
+
+    <!-- ===== KEY PRESS TEST ===== -->
+    <section class="test-panel" id="panel-keypress" role="tabpanel">
+      <div class="panel-header">
+        <h2 data-i18n="keyTitle">Key Reaction</h2>
+        <div class="options-row">
+          <div class="option-group">
+            <span class="option-label" data-i18n="duration">Duration</span>
+            <div class="pill-group" id="keyDuration">
+              <button class="pill" data-value="30">30s</button>
+              <button class="pill active" data-value="60">60s</button>
+              <button class="pill" data-value="120">120s</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-chip"><span class="stat-val" id="keyCount">0</span><span class="stat-lbl" data-i18n="keys">KEYS</span></div>
+        <div class="stat-chip"><span class="stat-val" id="keyAcc">0%</span><span class="stat-lbl" data-i18n="acc">ACC</span></div>
+        <div class="stat-chip"><span class="stat-val" id="keyTimer">60s</span><span class="stat-lbl" data-i18n="time">TIME</span></div>
+      </div>
+
+      <div class="key-display">
+        <div class="key-target" id="keyTarget">
+          <span class="key-char" id="keyChar">—</span>
+        </div>
+        <div class="key-feedback" id="keyFeedback" aria-live="polite"></div>
+      </div>
+
+      <div class="mobile-keypad" id="mobileKeypad" aria-label="Key input" role="group"></div>
+      <div class="key-history" id="keyHistory"></div>
+
+      <div class="action-row">
+        <button class="btn-primary" id="keyStart" data-i18n="start">Start</button>
+        <button class="btn-ghost" id="keyReset" data-i18n="reset">Reset</button>
+      </div>
+    </section>
+
+    <!-- ===== MOUSE AIM TEST ===== -->
+    <section class="test-panel" id="panel-mouse" role="tabpanel">
+      <div class="panel-header">
+        <h2 data-i18n="mouseTitle">Mouse Aim</h2>
+        <div class="options-row">
+          <div class="option-group">
+            <span class="option-label" data-i18n="speed">Speed</span>
+            <div class="pill-group" id="mouseSpeed">
+              <button class="pill" data-value="800">Slow</button>
+              <button class="pill active" data-value="1500">Normal</button>
+              <button class="pill" data-value="2200">Fast</button>
+              <button class="pill" data-value="3000">Insane</button>
+            </div>
+          </div>
+          <div class="option-group">
+            <span class="option-label" data-i18n="targetSize">Size</span>
+            <div class="pill-group" id="mouseSize">
+              <button class="pill" data-value="30">S</button>
+              <button class="pill active" data-value="50">M</button>
+              <button class="pill" data-value="70">L</button>
+            </div>
+          </div>
+          <div class="option-group">
+            <span class="option-label" data-i18n="duration">Time</span>
+            <div class="pill-group" id="mouseDuration">
+              <button class="pill" data-value="15">15s</button>
+              <button class="pill active" data-value="30">30s</button>
+              <button class="pill" data-value="45">45s</button>
+              <button class="pill" data-value="60">60s</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-chip"><span class="stat-val" id="mouseHits">0</span><span class="stat-lbl" data-i18n="hits">HITS</span></div>
+        <div class="stat-chip"><span class="stat-val" id="mouseAcc">0%</span><span class="stat-lbl" data-i18n="acc">ACC</span></div>
+        <div class="stat-chip"><span class="stat-val" id="mouseTimer">30s</span><span class="stat-lbl" data-i18n="time">TIME</span></div>
+      </div>
+
+      <div class="mouse-arena" id="mouseArena">
+        <div class="arena-hint" id="arenaHint" data-i18n="clickToStart">Tap to start</div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn-ghost" id="mouseReset" data-i18n="reset">Reset</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RESULTS MODAL -->
+  <div class="modal-overlay" id="resultsModal" role="dialog" aria-modal="true" aria-labelledby="resultsTitle" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="resultsTitle" data-i18n="resultsTitle">Results</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="resultsBody"></div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="modalRetry" data-i18n="retry">Retry</button>
+        <button class="btn-ghost" id="modalClose2" data-i18n="close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/typing.js"></script>
+  <script src="js/cps.js"></script>
+  <script src="js/keypress.js"></script>
+  <script src="js/mouse.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
