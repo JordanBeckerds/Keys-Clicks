@@ -1,122 +1,122 @@
-/* éphémère — Data Layer (localStorage) */
+/* éphémère — Firebase Realtime Database Layer */
 const DB = (() => {
-  const parse  = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
-  const store  = (k, v) => localStorage.setItem(k, JSON.stringify(v));
-  const remove = k => localStorage.removeItem(k);
+  let _db = null;
+
+  function init(config) {
+    if (!firebase.apps.length) firebase.initializeApp(config);
+    _db = firebase.database();
+    return _db;
+  }
+
+  function db() { return _db; }
+
+  function convId(a, b) { return [a, b].sort().join('__'); }
 
   return {
-    /* ---- Users ---- */
-    users: {
-      all()              { return parse('ep_users')  || []; },
-      save(list)         { store('ep_users', list); },
-      find(id)           { return this.all().find(u => u.id === id) || null; },
-      byUsername(name)   { return this.all().find(u => u.username.toLowerCase() === name.toLowerCase()) || null; },
-      update(id, patch)  {
-        const list = this.all();
-        const i = list.findIndex(u => u.id === id);
-        if (i < 0) return null;
-        list[i] = { ...list[i], ...patch };
-        this.save(list);
-        return list[i];
-      },
-      add(user)          {
-        const list = this.all();
-        list.push(user);
-        this.save(list);
-        return user;
-      }
+    init,
+    convId,
+
+    /* ── Online presence ── */
+    async isUsernameFree(username) {
+      const snap = await db().ref(`/online/${username}`).get();
+      if (!snap.exists()) return true;
+      // Same sessionId = page refresh by same tab → allow reclaim
+      const stored = sessionStorage.getItem('ephem_sid');
+      return stored && snap.val().sessionId === stored;
     },
 
-    /* ---- Session ---- */
-    session: {
-      get()      { return parse('ep_session'); },
-      set(id)    { store('ep_session', id); },
-      clear()    { remove('ep_session'); }
+    async claimUsername(username, userData) {
+      const ref = db().ref(`/online/${username}`);
+      const snap = await ref.get();
+      const stored = sessionStorage.getItem('ephem_sid');
+      if (snap.exists() && snap.val().sessionId !== stored) return false;
+      await ref.set(userData);
+      ref.onDisconnect().remove();
+      return true;
     },
 
-    /* ---- Messages ---- */
-    messages: {
-      all()           { return parse('ep_messages') || []; },
-      save(list)      { store('ep_messages', list); },
-      between(a, b)   {
-        return this.all().filter(m =>
-          (m.from === a && m.to === b) || (m.from === b && m.to === a)
-        );
-      },
-      add(msg) {
-        const list = this.all();
-        list.push(msg);
-        this.save(list);
-        return msg;
-      },
-      update(id, patch) {
-        const list = this.all();
-        const i = list.findIndex(m => m.id === id);
-        if (i < 0) return;
-        list[i] = { ...list[i], ...patch };
-        this.save(list);
-      }
+    releaseUsername(username) {
+      db().ref(`/online/${username}`).remove();
+      db().ref(`/online/${username}`).onDisconnect().cancel();
     },
 
-    /* ---- Stories ---- */
-    stories: {
-      all()       { return parse('ep_stories') || []; },
-      save(list)  { store('ep_stories', list); },
-      active()    {
-        const now = Date.now();
-        return this.all().filter(s => s.expiresAt > now);
-      },
-      add(story) {
-        const list = this.all();
-        list.push(story);
-        this.save(list);
-        return story;
-      },
-      markSeen(storyId, userId) {
-        const list = this.all();
-        const i = list.findIndex(s => s.id === storyId);
-        if (i < 0) return;
-        if (!list[i].seen) list[i].seen = [];
-        if (!list[i].seen.includes(userId)) list[i].seen.push(userId);
-        this.save(list);
-      }
+    watchOnline(callback) {
+      db().ref('/online').on('value', snap => {
+        const map = {};
+        snap.forEach(c => { map[c.key] = { username: c.key, ...c.val() }; });
+        callback(map);
+      });
     },
 
-    /* ---- Friend requests ---- */
-    requests: {
-      all()       { return parse('ep_requests') || []; },
-      save(list)  { store('ep_requests', list); },
-      add(req)    {
-        const list = this.all();
-        list.push(req);
-        this.save(list);
-      },
-      remove(from, to) {
-        const list = this.all().filter(r => !(r.from === from && r.to === to));
-        this.save(list);
-      }
+    offOnline() { db().ref('/online').off(); },
+
+    /* ── Messages ── */
+    sendMessage(cid, msg) {
+      return db().ref(`/messages/${cid}`).push(msg);
     },
 
-    /* ---- Streaks ---- */
-    streaks: {
-      _key(a, b) { return [a, b].sort().join('|'); },
-      get(a, b)  {
-        const all = parse('ep_streaks') || {};
-        return all[this._key(a, b)] || { count: 0, lastDate: null };
-      },
-      bump(a, b) {
-        const all = parse('ep_streaks') || {};
-        const key = this._key(a, b);
-        const today = new Date().toDateString();
-        const prev  = all[key] || { count: 0, lastDate: null };
-        const yesterday = new Date(Date.now() - 86400000).toDateString();
-        if (prev.lastDate === today) return;
-        all[key] = {
-          count: prev.lastDate === yesterday ? prev.count + 1 : 1,
-          lastDate: today
-        };
-        store('ep_streaks', all);
-      }
-    }
+    watchMessages(cid, onAdded, onChanged) {
+      db().ref(`/messages/${cid}`)
+        .orderByChild('sentAt')
+        .on('child_added',   s => onAdded({ id: s.key, ...s.val() }));
+      db().ref(`/messages/${cid}`)
+        .on('child_changed', s => onChanged && onChanged({ id: s.key, ...s.val() }));
+    },
+
+    offMessages(cid) { db().ref(`/messages/${cid}`).off(); },
+
+    updateMessage(cid, msgId, patch) {
+      return db().ref(`/messages/${cid}/${msgId}`).update(patch);
+    },
+
+    deleteMessage(cid, msgId) {
+      return db().ref(`/messages/${cid}/${msgId}`).remove();
+    },
+
+    /* ── Stories ── */
+    addStory(story) { return db().ref('/stories').push(story); },
+
+    watchStories(callback) {
+      const cutoff = Date.now() - 24 * 3600000;
+      db().ref('/stories').orderByChild('createdAt').startAt(cutoff)
+        .on('value', snap => {
+          const list = [];
+          snap.forEach(c => list.push({ id: c.key, ...c.val() }));
+          callback(list.filter(s => s.expiresAt > Date.now()));
+        });
+    },
+
+    offStories() { db().ref('/stories').off(); },
+
+    markStorySeen(storyId, username) {
+      return db().ref(`/stories/${storyId}/seen/${username}`).set(true);
+    },
+
+    /* ── Friend requests ── */
+    sendRequest(toUsername, data) {
+      return db().ref(`/requests/${toUsername}/${data.from}`).set(data);
+    },
+
+    watchRequests(username, callback) {
+      db().ref(`/requests/${username}`).on('value', snap => {
+        const list = [];
+        snap.forEach(c => list.push(c.val()));
+        callback(list);
+      });
+    },
+
+    offRequests(username) { db().ref(`/requests/${username}`).off(); },
+
+    removeRequest(toUsername, fromUsername) {
+      return db().ref(`/requests/${toUsername}/${fromUsername}`).remove();
+    },
+
+    /* ── Utility ── */
+    async getOnlineUser(username) {
+      const snap = await db().ref(`/online/${username}`).get();
+      return snap.exists() ? { username, ...snap.val() } : null;
+    },
+
+    timestamp: () => firebase.database.ServerValue.TIMESTAMP,
   };
 })();
