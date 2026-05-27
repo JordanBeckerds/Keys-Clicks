@@ -13,6 +13,8 @@
  *
  */
 window.EPHEM_CONFIG = {
+  // ⚠️  Remplace par ton apiKey Web (PAS le Database Secret) :
+  //     Firebase Console → ⚙️ Paramètres → Vos applications → Web → apiKey
   apiKey:      "SETUP_NEEDED",
-  databaseURL: "SETUP_NEEDED",   // ex: https://ton-projet-default-rtdb.firebaseio.com
+  databaseURL: "https://ephemere-8381b-default-rtdb.europe-west1.firebasedatabase.app",
 };
