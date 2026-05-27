@@ -13,6 +13,11 @@
  *
  */
 window.EPHEM_CONFIG = {
-  apiKey:      "SETUP_NEEDED",
-  databaseURL: "SETUP_NEEDED",   // ex: https://ton-projet-default-rtdb.firebaseio.com
+  apiKey:            "AIzaSyCufwf2hbmzmjzEftjLkRFq_m1yw0GdvUc",
+  authDomain:        "ephemere-8381b.firebaseapp.com",
+  databaseURL:       "https://ephemere-8381b-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "ephemere-8381b",
+  storageBucket:     "ephemere-8381b.firebasestorage.app",
+  messagingSenderId: "316264256416",
+  appId:             "1:316264256416:web:baf7f1e0ba3919ce0b4ac5",
 };
