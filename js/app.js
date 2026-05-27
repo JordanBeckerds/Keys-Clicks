@@ -5,6 +5,20 @@
 const EMOJIS = ['😊','😎','🥰','🤩','🤪','🦋','🌟','🔥','💎','🌙','🌸','🦊','🌿','🎸','🏄',
                 '🦁','🐺','🎩','🎯','💫','⚡','🌈','🍀','🎭','🌺','🦄','🐉','🎪','🌊','🏔️'];
 
+function showToast(msg, duration = 2000) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.getElementById('app').appendChild(t);
+  requestAnimationFrame(() => { t.classList.add('show'); });
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 300);
+  }, duration);
+}
+
 /* ── Helpers ───────────────────────────── */
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -260,7 +274,7 @@ const Views = {
     root.innerHTML = `
       <div class="home-view" id="home-wrap">
         <div class="topbar">
-          <span class="topbar-logo">éphémère</span>
+          <span class="topbar-logo">éphémère <span id="online-count" style="font-size:13px;color:var(--success);margin-left:8px">● 0 en ligne</span></span>
           <button class="hamburger" id="open-drawer" aria-label="Conversations">
             <span></span><span></span><span></span>
             <span class="notif-dot hidden" id="notif-dot"></span>
@@ -277,7 +291,7 @@ const Views = {
 
         <!-- Separator (shown only if there are inactive) -->
         <div class="separator hidden" id="sep">
-          <span class="separator-label">en ligne</span>
+          <span class="separator-label">autres</span>
         </div>
 
         <!-- Inactive floating zone -->
@@ -313,10 +327,29 @@ const Views = {
     DB.watchOnline(users => {
       onlineUsers = users;
       renderContacts();
-      // Unread dot
-      checkUnread();
+      // Update online count in topbar
+      const countEl = root.querySelector('#online-count');
+      if (countEl) {
+        const n = Object.values(users).filter(u => u.username !== me.username).length;
+        countEl.textContent = `● ${n} en ligne`;
+      }
     });
     App._unsubs.push(() => DB.offOnline());
+
+    // Single persistent unread watcher
+    firebase.database().ref('/messages').on('value', snap => {
+      const dot = root.querySelector('#notif-dot');
+      if (!dot) return;
+      let hasUnread = false;
+      snap.forEach(conv => {
+        conv.forEach(msg => {
+          const v = msg.val();
+          if (v.to === me.username && !v.read) hasUnread = true;
+        });
+      });
+      dot.classList.toggle('hidden', !hasUnread);
+    });
+    App._unsubs.push(() => firebase.database().ref('/messages').off());
 
     // Nav
     root.querySelectorAll('.nav-btn[data-view]').forEach(btn =>
@@ -326,23 +359,6 @@ const Views = {
       })
     );
     root.querySelector('#open-drawer').addEventListener('click', () => openDrawer(me, onlineUsers));
-
-    function checkUnread() {
-      // Watch for unread messages from online users
-      const dot = root.querySelector('#notif-dot');
-      if (!dot) return;
-      let hasUnread = false;
-      Object.values(onlineUsers).forEach(u => {
-        if (u.username === me.username) return;
-        const cid = DB.convId(me.username, u.username);
-        firebase.database().ref(`/messages/${cid}`)
-          .orderByChild('to').equalTo(me.username)
-          .once('value', snap => {
-            snap.forEach(c => { if (!c.val().read) hasUnread = true; });
-            dot.classList.toggle('hidden', !hasUnread);
-          });
-      });
-    }
 
     function renderContacts() {
       const others   = Object.values(onlineUsers).filter(u => u.username !== me.username);
@@ -473,7 +489,7 @@ const Views = {
           <div class="chat-contact">
             ${avatar(contact, 'sz-sm')}
             <span class="chat-contact-name">${escHtml(contact.displayName)}</span>
-            <span style="font-size:11px;color:var(--success);margin-left:2px">● en ligne</span>
+            <span id="contact-status" style="font-size:11px;color:var(--success);margin-left:2px">● en ligne</span>
           </div>
           <div class="ephemeral-notice">
             <span class="ep-dot"></span>
@@ -501,6 +517,20 @@ const Views = {
     const sendBtn = root.querySelector('#send-btn');
 
     root.querySelector('#back').addEventListener('click', () => App.go('home'));
+
+    // Watch contact online status
+    DB.watchOnline(users => {
+      const statusEl = root.querySelector('#contact-status');
+      if (!statusEl) return;
+      if (users[contact.username]) {
+        statusEl.textContent = '● en ligne';
+        statusEl.style.color = 'var(--success)';
+      } else {
+        statusEl.textContent = '● hors ligne';
+        statusEl.style.color = 'var(--text-muted)';
+      }
+    });
+    App._unsubs.push(() => DB.offOnline());
 
     const rendered = new Set();
 
@@ -742,6 +772,7 @@ const Views = {
     if (!me) { App.go('auth'); return; }
 
     let onlineUsers = {};
+    let pendingRequests = [];
 
     function render() {
       const others = Object.values(onlineUsers).filter(u => u.username !== me.username);
@@ -760,7 +791,7 @@ const Views = {
 
             <div class="profile-stats">
               <div class="stat">
-                <span class="stat-val" id="online-count">${others.length}</span>
+                <span class="stat-val" id="online-stat">${others.length}</span>
                 <span class="stat-lbl">En ligne</span>
               </div>
               <div class="stat">
@@ -768,6 +799,28 @@ const Views = {
                 <span class="stat-lbl">Messages</span>
               </div>
             </div>
+
+            <!-- Share link -->
+            <div class="profile-section">
+              <div class="section-hd">Inviter</div>
+              <button class="btn-accent-sm" id="copy-link-btn" style="width:100%;padding:13px;font-size:14px;border-radius:var(--r-sm)">Copier le lien ✦</button>
+            </div>
+
+            ${pendingRequests.length > 0 ? `
+            <div class="profile-section">
+              <div class="section-hd">Demandes (${pendingRequests.length})</div>
+              ${pendingRequests.map(r => `
+                <div class="req-item">
+                  <div class="req-info">
+                    <div class="req-name">${escHtml(r.fromDisplay || r.from)}</div>
+                    <div class="req-uname">@${escHtml(r.from)}</div>
+                  </div>
+                  <div class="req-actions">
+                    <button class="btn-ok" data-accept="${escHtml(r.from)}">Accepter</button>
+                    <button class="btn-no" data-decline="${escHtml(r.from)}">Refuser</button>
+                  </div>
+                </div>`).join('')}
+            </div>` : ''}
 
             <!-- Online users -->
             ${others.length > 0 ? `
@@ -799,10 +852,29 @@ const Views = {
         App.go('auth');
       });
 
+      root.querySelector('#copy-link-btn').addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          showToast('Lien copié ✓');
+        }).catch(() => {
+          showToast('Impossible de copier');
+        });
+      });
+
       root.querySelectorAll('[data-chat]').forEach(btn =>
         btn.addEventListener('click', () => {
           const u = onlineUsers[btn.dataset.chat];
           if (u) App.go('chat', u, 'view-from-right');
+        })
+      );
+
+      root.querySelectorAll('[data-accept]').forEach(btn =>
+        btn.addEventListener('click', () => {
+          DB.removeRequest(me.username, btn.dataset.accept);
+        })
+      );
+      root.querySelectorAll('[data-decline]').forEach(btn =>
+        btn.addEventListener('click', () => {
+          DB.removeRequest(me.username, btn.dataset.decline);
         })
       );
 
@@ -821,6 +893,9 @@ const Views = {
 
     DB.watchOnline(users => { onlineUsers = users; render(); });
     App._unsubs.push(() => DB.offOnline());
+
+    DB.watchRequests(me.username, reqs => { pendingRequests = reqs; render(); });
+    App._unsubs.push(() => DB.offRequests(me.username));
 
     render();
   }
